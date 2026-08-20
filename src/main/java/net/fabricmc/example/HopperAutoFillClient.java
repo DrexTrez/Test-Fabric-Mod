@@ -1,0 +1,30 @@
+package net.fabricmc.example;
+
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import org.lwjgl.glfw.GLFW;
+
+public class HopperAutoFillClient implements ClientModInitializer {
+
+    public static KeyMapping openGuiKey;
+
+    @Override
+    public void onInitializeClient() {
+        openGuiKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+            "key.hopper_autofill.open",
+            GLFW.GLFW_KEY_H,
+            "category.hopper_autofill"
+        ));
+
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            while (openGuiKey.consumeClick()) {
+                if (client.player != null && client.level != null) {
+                    client.setScreen(new HopperPotionScreen(client.player));
+                }
+            }
+        });
+    }
+}
